@@ -13,7 +13,7 @@ os.chdir(os.path.dirname(__file__))
 client = commands.Bot(command_prefix="o!")
 client.remove_command("help")
 
-with open('token.txt' ,'r') as f:
+with open('data/token.txt' ,'r') as f:
     token = f.readline()
 
 
@@ -49,7 +49,7 @@ async def help(ctx):
         icon_url = "https://cdn.discordapp.com/avatars/{0.id}/{0.avatar}.png?size=1024".format(client.user)
     )
 
-    f = open("data.txt", "r")
+    f = open("data/images.txt", "r")
     L = f.readlines()
 
     embed.add_field(
@@ -75,12 +75,12 @@ async def channel(ctx):
 
         channel = ctx.channel.id
 
-        with open('guilds.json', encoding='utf-8') as f:
+        with open('data/guilds.json', encoding='utf-8') as f:
             data = json.load(f)
 
         data[str(ctx.guild.id)] = channel
 
-        with open('guilds.json', 'w', encoding='utf-8') as jf:
+        with open('data/guilds.json', 'w', encoding='utf-8') as jf:
             json.dump(data, jf, indent=4, ensure_ascii=False)
 
         await ctx.channel.send("✅ OGAT will now only send images the channel <#{}> on this server.".format(channel))
@@ -92,7 +92,7 @@ async def channel(ctx):
 @client.command()
 async def ogat(ctx):
 
-    with open('guilds.json', encoding='utf-8') as f:
+    with open('data/guilds.json', encoding='utf-8') as f:
         data = json.load(f)
 
     if str(ctx.guild.id) in data:
@@ -101,7 +101,7 @@ async def ogat(ctx):
 
         if ctx.channel == channel:
 
-            with open("data.txt", 'r') as f:
+            with open("data/images.txt", 'r') as f:
                 L = f.readlines()
 
             img = random.choice(L)
@@ -124,11 +124,10 @@ async def ogat(ctx):
         await ctx.channel.send("❌ This server did not set a channel to send image. An admin must use ``o!channel`` in a channel to allow the bot to send images.")
 
 
-
 @client.command()
 async def get(ctx, pos):
 
-    with open('guilds.json', encoding='utf-8') as f:
+    with open('data/guilds.json', encoding='utf-8') as f:
         data = json.load(f)
 
     if str(ctx.guild.id) in data:
@@ -137,7 +136,7 @@ async def get(ctx, pos):
 
         if ctx.channel == channel:
 
-            f = open("data.txt", "r")
+            f = open("data/images.txt", "r")
             L = f.readlines()
 
             if pos == "last":
@@ -182,7 +181,7 @@ async def get(ctx, pos):
 @client.command()
 async def request(ctx, url):
 
-    with open('guilds.json', encoding='utf-8') as f:
+    with open('data/guilds.json', encoding='utf-8') as f:
         data = json.load(f)
 
     if str(ctx.guild.id) in data:
@@ -191,14 +190,14 @@ async def request(ctx, url):
 
         if ctx.channel == channel:
 
-            f = open('blocklist.txt', 'r')
+            f = open('users/blocklist.txt', 'r')
             L = f.readlines()
             if str(ctx.author.id) in L or "{}\n".format(str(ctx.author.id)) in L:
                 await ctx.channel.send("<@{}> You are blocked from requesting images to the bot.".format(ctx.author.id))
 
             else:
                 try:
-                    f = open("data.txt", "r")
+                    f = open("data/images.txt", "r")
                     L = f.readlines()
                     f.close()
 
@@ -217,19 +216,19 @@ async def request(ctx, url):
                     await ctx.channel.send('❌ URL is invalid')
                 
                 else:
-                    f = open("data.txt", "r")
+                    f = open("data/images.txt", "r")
                     L = f.readlines()
                     if url in L:
                         await ctx.channel.send('❌ URL is already in the database')
                     else:
-                        a = open("admins.txt", 'r')
+                        a = open("users/admins.txt", 'r')
                         L = a.readlines()
                         if "{}\n".format(str(ctx.author.id)) in L or str(ctx.author.id) in L or ctx.guild.id == 743534084940234772:
-                            f = open("data.txt", 'a+')
+                            f = open("data/images.txt", 'a+')
                             f.write("\n{}".format(url))
                             f.close()
 
-                            await ctx.channel.send("Image ajoutée **N°{}**".format(len(open("data.txt", "r").readlines())-1))
+                            await ctx.channel.send("Image ajoutée **N°{}**".format(len(open("data/images.txt", "r").readlines())-1))
                         else:
                             await ctx.channel.send("✅ Image request sent.")
 
@@ -265,11 +264,11 @@ async def add(ctx, idm):
                 await ctx.channel.send("❌ Cet ID n'est pas correct")
             else:
                 url = msg.content
-                f = open("data.txt", "a+")
+                f = open("data/images.txt", "a+")
                 f.write("\n{}".format(url))
                 f.close()
 
-                f = open("data.txt", "r")
+                f = open("data/images.txt", "r")
                 L = f.readlines()
                 
                 await ctx.channel.send("✅ Image ajoutée. Image n°{}".format(len(L)-1))
@@ -284,12 +283,12 @@ async def block(ctx, idb):
 
     if ctx.guild.id == 743534084940234772:
     
-        f = open('blocklist.txt', 'r')
+        f = open('users/blocklist.txt', 'r')
         L = f.readlines()
         if idb in L:
             await ctx.channel.send("This user is already in the blocked users list.")
         else:
-            f = open("blocklist.txt", 'a+')
+            f = open("users/blocklist.txt", 'a+')
             f.write("\n{}".format(idb))
             f.close()
 
@@ -303,12 +302,12 @@ async def admin(ctx, ida):
 
     if ctx.guild.id == 743534084940234772:
 
-        f = open('admins.txt', 'r')
+        f = open('users/admins.txt', 'r')
         L = f.readlines()
         if ida in L:
             await ctx.channel.send("This user is already in the admins list.")
         else:
-            f = open("admins.txt", 'a+')
+            f = open("users/admins.txt", 'a+')
             f.write("\n{}".format(ida))
             f.close()
 
