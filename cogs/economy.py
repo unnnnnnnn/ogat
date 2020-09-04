@@ -32,7 +32,7 @@ class Economy(commands.Cog):
             data = json.load(f)
 
         if mid in data[gid]["users"]:
-            await ctx.channel.send("<@{}>'s balance is: **{} coins.**".format(int(ctx.author.id), data[gid]["users"][mid]))
+            await ctx.channel.send("<@{}>'s balance in {} is: **{} coins.**".format(int(ctx.author.id), self.client.get_guild(ctx.guild.id), data[gid]["users"][mid]))
 
 
     @commands.command()
